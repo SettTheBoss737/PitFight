@@ -1,0 +1,381 @@
+{
+  "bots": {
+    "rules": {
+      "list": "true",
+      "create": "$USER_ID === $OWNER_ID",
+      "delete": "$USER_ID === $OWNER_ID",
+      "update": "$USER_ID === $OWNER_ID"
+    },
+    "fields": {
+      "name": "String",
+      "wins": "Number",
+      "losses": "Number",
+      "rewardAmount": "Number"
+    }
+  },
+  "lobbies": {
+    "rules": {
+      "list": "true",
+      "create": "$USER_ID === $OWNER_ID",
+      "delete": "$USER_ID === $OWNER_ID",
+      "update": "$USER_ID === $OWNER_ID"
+    },
+    "fields": {
+      "name": "String",
+      "status": "String"
+    }
+  },
+  "matches": {
+    "rules": {
+      "list": "true",
+      "create": "true",
+      "delete": "$USER_ID === $OWNER_ID",
+      "update": "true"
+    },
+    "fields": {
+      "status": "String",
+      "winnerId": "String",
+      "betAmount": "Number",
+      "player1Id": "String",
+      "player2Id": "String",
+      "player1Name": "String",
+      "player2Name": "String"
+    },
+    "actions": {
+      "create": {
+        "compute": {
+          "status": "$newData.player2Id ? 'picking' : 'waiting'"
+        },
+        "transfer": {
+          "to": "$VAULT_ADDRESS",
+          "from": "$USER_ID",
+          "token": "$TOKEN_SOL",
+          "amount": "$FUNC_GET_TRANSFER_AMOUNT($newData.betAmount)"
+        }
+      },
+      "update": {
+        "compute": {
+          "status": "picking"
+        },
+        "transfer": {
+          "to": "$VAULT_ADDRESS",
+          "from": "$USER_ID",
+          "token": "$TOKEN_SOL",
+          "amount": "$data.betAmount"
+        }
+      }
+    }
+  },
+  "players": {
+    "rules": {
+      "list": "true",
+      "create": "true",
+      "update": "false"
+    },
+    "fields": {
+      "wins": "Number",
+      "losses": "Number",
+      "summonerName": "String"
+    }
+  },
+  "aram_bets": {
+    "rules": {
+      "list": "true",
+      "create": "$FUNC_CAN_BET($newData.matchId)"
+    },
+    "fields": {
+      "matchId": "String",
+      "betAmount": "Number",
+      "predictedWinnerId": "String"
+    },
+    "actions": {
+      "create": {
+        "transfer": {
+          "to": "$VAULT_ADDRESS",
+          "from": "$USER_ID",
+          "token": "$TOKEN_SOL",
+          "amount": "$newData.betAmount"
+        }
+      }
+    }
+  },
+  "aram_picks": {
+    "rules": {
+      "get": "$FUNC_CAN_VIEW_PICKS($data.matchId)",
+      "list": "$FUNC_CAN_VIEW_PICKS($data.matchId)",
+      "create": "$FUNC_CAN_CREATE_PICK($newData.matchId)"
+    },
+    "fields": {
+      "runes": "String",
+      "matchId": "String",
+      "champion": "String",
+      "playerId": "String",
+      "summonerSpells": "String"
+    }
+  },
+  "arena_bets": {
+    "rules": {
+      "list": "true",
+      "create": "$FUNC_CAN_BET_ARENA($newData.matchId)"
+    },
+    "fields": {
+      "matchId": "String",
+      "betAmount": "Number",
+      "predictedWinnerId": "String"
+    },
+    "actions": {
+      "create": {
+        "transfer": {
+          "to": "$VAULT_ADDRESS",
+          "from": "$USER_ID",
+          "token": "$TOKEN_SOL",
+          "amount": "$newData.betAmount"
+        }
+      }
+    }
+  },
+  "arena_picks": {
+    "rules": {
+      "get": "$FUNC_CAN_VIEW_ARENA_PICKS($data.matchId)",
+      "list": "$FUNC_CAN_VIEW_ARENA_PICKS($data.matchId)",
+      "create": "$FUNC_CAN_CREATE_ARENA_PICK($newData.matchId)"
+    },
+    "fields": {
+      "runes": "String",
+      "matchId": "String",
+      "champion": "String",
+      "playerId": "String",
+      "summonerSpells": "String"
+    }
+  },
+  "bot_rewards": {
+    "rules": {
+      "list": "true",
+      "create": "$FUNC_CAN_CLAIM_BOT_REWARD($newData.botId)"
+    },
+    "fields": {
+      "botId": "String",
+      "amount": "Number"
+    },
+    "actions": {
+      "create": {
+        "compute": {
+          "amount": "$FUNC_GET_BOT_REWARD_AMOUNT($newData.botId)"
+        },
+        "transfer": {
+          "to": "$USER_ID",
+          "from": "$VAULT_ADDRESS",
+          "token": "$TOKEN_SOL",
+          "amount": "$newData.amount"
+        }
+      }
+    }
+  },
+  "withdrawals": {
+    "rules": {
+      "create": "$FUNC_CAN_WITHDRAW($newData.matchId)"
+    },
+    "fields": {
+      "amount": "Number",
+      "matchId": "String"
+    },
+    "actions": {
+      "create": {
+        "compute": {
+          "amount": "$FUNC_GET_WITHDRAWAL_AMOUNT($newData.matchId)"
+        },
+        "transfer": {
+          "to": "$USER_ID",
+          "from": "$VAULT_ADDRESS",
+          "token": "$TOKEN_SOL",
+          "amount": "$newData.amount"
+        }
+      }
+    }
+  },
+  "aram_matches": {
+    "rules": {
+      "list": "true",
+      "create": "true",
+      "update": "true"
+    },
+    "fields": {
+      "status": "String",
+      "winnerId": "String",
+      "betAmount": "Number",
+      "player1Id": "String",
+      "player2Id": "String",
+      "player1Name": "String",
+      "player2Name": "String"
+    },
+    "actions": {
+      "create": {
+        "compute": {
+          "status": "picking"
+        },
+        "transfer": {
+          "to": "$VAULT_ADDRESS",
+          "from": "$USER_ID",
+          "token": "$TOKEN_SOL",
+          "amount": "$FUNC_GET_TRANSFER_AMOUNT($newData.betAmount)"
+        }
+      },
+      "update": {
+        "transfer": {
+          "to": "$VAULT_ADDRESS",
+          "from": "$USER_ID",
+          "token": "$TOKEN_SOL",
+          "amount": "$data.betAmount"
+        }
+      }
+    }
+  },
+  "lol_accounts": {
+    "rules": {
+      "list": "true",
+      "create": "true",
+      "update": "$USER_ID === $data.userId || $data.userId === ''"
+    },
+    "fields": {
+      "pin": "String",
+      "username": "String",
+      "isFounder": "Boolean"
+    },
+    "actions": {
+      "create": {
+        "compute": {
+          "isFounder": "$FUNC_IS_FOUNDER()"
+        }
+      }
+    }
+  },
+  "pit_balances": {
+    "rules": {
+      "list": "true",
+      "create": "true",
+      "update": "$USER_ID === $OWNER_ID"
+    },
+    "fields": {
+      "balance": "Number",
+      "summonerName": "String"
+    }
+  },
+  "pit_earnings": {
+    "rules": {
+      "list": "true",
+      "create": "$USER_ID === $OWNER_ID"
+    },
+    "fields": {
+      "amount": "Number",
+      "reason": "String",
+      "matchId": "String",
+      "summonerName": "String"
+    }
+  },
+  "lobby_members": {
+    "rules": {
+      "list": "true",
+      "create": "$USER_ID === $OWNER_ID"
+    },
+    "fields": {
+      "lobbyId": "String",
+      "playerId": "String"
+    }
+  },
+  "aram_withdrawals": {
+    "rules": {
+      "create": "$FUNC_CAN_WITHDRAW_ARAM($newData.matchId)"
+    },
+    "fields": {
+      "amount": "Number",
+      "matchId": "String"
+    },
+    "actions": {
+      "create": {
+        "compute": {
+          "amount": "$FUNC_GET_ARAM_WITHDRAWAL_AMOUNT($newData.matchId)"
+        },
+        "transfer": {
+          "to": "$USER_ID",
+          "from": "$VAULT_ADDRESS",
+          "token": "$TOKEN_SOL",
+          "amount": "$newData.amount"
+        }
+      }
+    }
+  },
+  "boss_invitations": {
+    "rules": {
+      "list": "$USER_ID === $data.userId || $USER_ID === $OWNER_ID",
+      "create": "true",
+      "update": "$USER_ID === $data.userId || $USER_ID === $OWNER_ID"
+    },
+    "fields": {
+      "count": "Number"
+    }
+  },
+  "arena_withdrawals": {
+    "rules": {
+      "create": "$FUNC_CAN_WITHDRAW_ARENA_BET($newData.matchId)"
+    },
+    "fields": {
+      "amount": "Number",
+      "matchId": "String"
+    },
+    "actions": {
+      "create": {
+        "compute": {
+          "amount": "$FUNC_GET_ARENA_BET_WITHDRAWAL_AMOUNT($newData.matchId)"
+        },
+        "transfer": {
+          "to": "$USER_ID",
+          "from": "$VAULT_ADDRESS",
+          "token": "$TOKEN_SOL",
+          "amount": "$newData.amount"
+        }
+      }
+    }
+  },
+  "pitboss_challenges": {
+    "rules": {
+      "list": "true",
+      "create": "true",
+      "update": "$USER_ID === $OWNER_ID"
+    },
+    "fields": {
+      "type": "String",
+      "status": "String",
+      "matchId": "String",
+      "winnerId": "String",
+      "pitbossId": "String",
+      "challengerId": "String",
+      "challengerName": "String"
+    },
+    "actions": {
+      "create": {
+        "compute": {
+          "status": "'pending'"
+        }
+      }
+    }
+  },
+  "dev_fee_withdrawals": {
+    "rules": {
+      "list": "$USER_ID === $OWNER_ID",
+      "create": "$FUNC_CAN_WITHDRAW_DEV_FEES($newData.amount)"
+    },
+    "fields": {
+      "amount": "Number"
+    },
+    "actions": {
+      "create": {
+        "transfer": {
+          "to": "$USER_ID",
+          "from": "$VAULT_ADDRESS",
+          "token": "$TOKEN_SOL",
+          "amount": "$newData.amount"
+        }
+      }
+    }
+  }
+}
